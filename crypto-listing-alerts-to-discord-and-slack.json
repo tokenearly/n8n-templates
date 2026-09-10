@@ -1,0 +1,270 @@
+{
+  "name": "Tokenearly: crypto listing alerts → Discord + Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tokenearly-alerts",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "4e301eb6-88ce-4c55-815e-9a79b8665e28",
+      "name": "Tokenearly Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "7131ef35-b882-4837-8286-0ce74f89db66",
+      "notes": "Paste this node's Production URL into Tokenearly → Dashboard → notification channels → Webhook."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "4e881553-639b-4690-942f-60e838b9d2dd",
+              "leftValue": "={{ $json.headers.authorization }}",
+              "rightValue": "Bearer REPLACE_WITH_YOUR_TOKENEARLY_BEARER_TOKEN",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b76937e6-1257-444b-9a05-85c657b39145",
+      "name": "Check Bearer Token",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "notes": "Replace the right-hand value with the Bearer Token you set in the Tokenearly dashboard."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "a92deb20-ddae-48dd-929f-261134d9bcad",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "list",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "e80d366b-1d6b-4e5d-95b3-63ab639b36ff",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "上线",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "1466e7b0-4d8a-45d4-8148-202e21211595",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "上币",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "58abcf65-30fa-41b6-990d-d06c7676a62d",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "新增",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "15bc8d1d-c92f-4a55-af3e-f551fba108bf",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "상장",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "287e4a83-92c5-43cd-bf48-647cfb4e07fd",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "listing",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "2e972727-44f1-485c-8d8a-dac5c02a8234",
+      "name": "Is Listing Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        520,
+        200
+      ],
+      "notes": "Passes alerts whose title or content contains a listing keyword (English, Chinese, Korean). Edit or remove to forward everything."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/webhooks/REPLACE/REPLACE",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=**{{ $json.body.title }}**\n{{ $json.body.content.slice(0, 1800) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "24916fa2-cd3c-45ea-9ac7-a3f568f85163",
+      "name": "Send to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        120
+      ],
+      "notes": "Replace the URL with your Discord channel webhook (Channel settings → Integrations → Webhooks). Discord messages are capped at 2000 characters."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/REPLACE/REPLACE/REPLACE",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=*{{ $json.body.title }}*\n{{ $json.body.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37d3a48e-e2fd-4bba-b01d-5658cb0a3f83",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        300
+      ],
+      "notes": "Replace the URL with your Slack Incoming Webhook (https://api.slack.com/messaging/webhooks)."
+    },
+    {
+      "parameters": {},
+      "id": "040c2079-3916-4456-b9ac-0931d5b26ab9",
+      "name": "Ignore (bad token)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        520,
+        460
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "80e32acf-018e-408b-9d25-856c8ad9ea5a",
+      "name": "Ignore (not a listing)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Tokenearly Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Bearer Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Bearer Token": {
+      "main": [
+        [
+          {
+            "node": "Is Listing Alert?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore (bad token)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Listing Alert?": {
+      "main": [
+        [
+          {
+            "node": "Send to Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore (not a listing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Receives Tokenearly webhook alerts, verifies the Bearer Token, keeps listing-related alerts and posts them to a Discord webhook and a Slack incoming webhook. No extra credentials needed."
+  },
+  "tags": []
+}

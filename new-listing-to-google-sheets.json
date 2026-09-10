@@ -1,0 +1,311 @@
+{
+  "name": "Tokenearly: new listing announcements → Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tokenearly-alerts",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "f608818e-eb37-417c-b073-d69e2079a47d",
+      "name": "Tokenearly Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "8700af86-cc79-46fa-8a00-f06367d6f748",
+      "notes": "Paste this node's Production URL into Tokenearly → Dashboard → notification channels → Webhook."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "187b98f3-8790-4f01-a05e-1bfd07ae1fc9",
+              "leftValue": "={{ $json.headers.authorization }}",
+              "rightValue": "Bearer REPLACE_WITH_YOUR_TOKENEARLY_BEARER_TOKEN",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3542b2f5-e8ca-4f9e-aa04-e838e947cd3b",
+      "name": "Check Bearer Token",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "notes": "Replace the right-hand value with the Bearer Token you set in the Tokenearly dashboard."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "ab9cd14d-5c64-4bf3-8020-d1ee5dd09730",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "list",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "97edc709-b7d1-44b0-90b0-16c1c827d866",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "上线",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "2e35a323-117f-4eb3-aaa5-43e5e8ff3357",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "上币",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "2cd2ea88-57c1-4478-a134-ed2648bf7de8",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "新增",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "238ad660-a4a5-4983-bc34-5125871af509",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "상장",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "326093fb-6c2f-4e62-b23b-cc597971c978",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "listing",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "88660cd2-f455-4094-bad2-0b79c1e8f491",
+      "name": "Is Listing Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        520,
+        200
+      ],
+      "notes": "Passes alerts whose title or content contains a listing keyword (English, Chinese, Korean). Edit or remove to forward everything."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "356d2681-b59b-405d-b389-3bd1e27e8d35",
+              "name": "received_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "846aa14b-f2d2-4fea-86ea-0a865e415d2b",
+              "name": "exchange",
+              "value": "={{ ($json.body.title.match(/【([^】]+)】/) || [])[1] || $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "6cd58d8f-aab7-4c9f-949d-f4fada57ce43",
+              "name": "headline",
+              "value": "={{ $json.body.content.split('\\n')[0].replace(/^\\[(ZH|EN)\\] /, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "720ad53c-a9ce-489c-bc22-31469c0052b9",
+              "name": "url",
+              "value": "={{ $json.body.url || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8ed10393-01cd-420f-85df-74be1c4e531d",
+              "name": "sent_at_unix",
+              "value": "={{ $json.body.timestamp }}",
+              "type": "number"
+            },
+            {
+              "id": "5acdc7a7-1389-458f-8202-9dde70db123a",
+              "name": "content",
+              "value": "={{ $json.body.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ffcb8a65-0f17-48b0-aa3f-0a557e468002",
+      "name": "Map Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        200
+      ],
+      "notes": "Turns the Tokenearly body into flat columns: received_at, exchange, headline, url, sent_at_unix, content."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_SPREADSHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Listings"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "4a57dcdc-886a-4dc7-aebe-241ed15c9884",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1060,
+        200
+      ],
+      "notes": "Select your Google Sheets credential. The sheet 'Listings' needs a header row: received_at | exchange | headline | url | sent_at_unix | content"
+    },
+    {
+      "parameters": {},
+      "id": "f47b1fdb-f2b1-48c0-b101-e50dca067835",
+      "name": "Ignore (bad token)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        520,
+        460
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "70d97aa8-73e5-4396-82f0-130294f717b3",
+      "name": "Ignore (not a listing)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Tokenearly Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Bearer Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Bearer Token": {
+      "main": [
+        [
+          {
+            "node": "Is Listing Alert?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore (bad token)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Listing Alert?": {
+      "main": [
+        [
+          {
+            "node": "Map Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore (not a listing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Fields": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Receives Tokenearly webhook alerts, verifies the Bearer Token, keeps listing announcements and appends one row per alert to a Google Sheet."
+  },
+  "tags": []
+}

@@ -1,0 +1,805 @@
+{
+  "name": "Monitor new token listings from 10 crypto exchanges and send alerts to Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Crypto exchange listing alerts, no account needed\n\nWatches 10 crypto exchanges and posts every new token listing to Telegram, with optional Discord and Google Sheets copies.\n\n### How it works\n\n1. **Every 5 minutes** starts the run.\n2. **Your settings** holds everything you might want to change: which exchanges, spot or futures, a keyword filter, how far back to look, and whether to also send to Discord or log to a sheet.\n3. **Fetch new listings** calls a free, public, read-only JSON feed. No account, no API key, no token.\n4. **Feed returned items?** guards the rest of the run, so an empty or failed response ends quietly instead of throwing.\n5. **Only listings not seen before** remembers each listing's permalink across executions, so a restart or an overlapping window never re-announces one.\n6. Two filters narrow the stream to the exchanges and keywords you care about.\n7. **Prepare alert fields** picks the headline in your language and builds the message.\n8. Spot and futures listings take separate Telegram branches so each reads differently.\n\n### Setup\n\n1. Add a **Telegram** credential, using a bot token from @BotFather.\n2. Open **Your settings** and set `telegram_chat_id` to your chat, group or channel ID.\n3. Leave `send_to_discord` and `log_to_sheet` as `false` unless you want them. To use them, paste a Discord webhook URL, or pick a Google Sheets credential and set the spreadsheet ID.\n4. Save, then activate the workflow.\n\n### Customization tips\n\nNarrow the feed with `exchanges` (`binance,okx`) or `listing_type` (`spot` or `futures`). Raise `lookback_days` up to 30 to backfill on the first run. Titles arrive in three languages, so `title.en`, `title.zh` and `title.ko` are all available.",
+        "height": 380,
+        "width": 620,
+        "color": 1
+      },
+      "id": "00000000-0000-4000-8000-000000000001",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1. Poll the public feed\nA schedule trigger, your settings in one place, one HTTP request to a free read-only endpoint, and a guard so an empty response ends the run quietly. No credential is needed here.",
+        "height": 420,
+        "width": 800,
+        "color": 7
+      },
+      "id": "00000000-0000-4000-8000-000000000002",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2. One item per listing, new ones only\nSplit Out expands the array. Remove Duplicates stores every permalink already handled. The two filters keep only the exchanges and keywords you chose in settings.",
+        "height": 420,
+        "width": 880,
+        "color": 7
+      },
+      "id": "00000000-0000-4000-8000-000000000003",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        760,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3. Build the message\nPick the headline in your language, join the token symbols, work out how old the announcement is, and compose the text once for every channel.",
+        "height": 420,
+        "width": 200,
+        "color": 7
+      },
+      "id": "00000000-0000-4000-8000-000000000004",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4. Deliver\nSpot and futures get separate Telegram branches so each reads differently. Discord and Google Sheets are optional and stay off until you switch them on in settings.",
+        "height": 680,
+        "width": 460,
+        "color": 7
+      },
+      "id": "00000000-0000-4000-8000-000000000005",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000006",
+      "name": "Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        480
+      ],
+      "notes": "How often to check the feed. Every 5 minutes is a good balance; the feed is cached for 5 minutes anyway."
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00000000-0000-4000-8000-000000000007",
+              "name": "telegram_chat_id",
+              "value": "YOUR_CHAT_ID",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000008",
+              "name": "exchanges",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000009",
+              "name": "listing_type",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000000a",
+              "name": "keyword",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000000b",
+              "name": "lookback_days",
+              "value": "1",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000000c",
+              "name": "language",
+              "value": "en",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000000d",
+              "name": "send_to_discord",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000000e",
+              "name": "discord_webhook_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000000f",
+              "name": "log_to_sheet",
+              "value": "false",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000010",
+      "name": "Your settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        480
+      ],
+      "notes": "Everything you may want to change lives here. exchanges: comma separated ids such as binance,okx (empty = all). listing_type: spot or futures (empty = both). keyword: only alert when the headline contains it (empty = no filter). language: en, zh or ko. Leave send_to_discord and log_to_sheet as false until you configure them."
+    },
+    {
+      "parameters": {
+        "url": "https://tokenearly.com/api/public/listings.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "days",
+              "value": "={{ $json.lookback_days }}"
+            },
+            {
+              "name": "exchange",
+              "value": "={{ $json.exchanges }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.listing_type }}"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000011",
+      "name": "Fetch new listings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        480
+      ],
+      "notes": "A free, public, read-only JSON feed of new token listings across 10 exchanges. No account and no API key. neverError is on so a bad response is handled by the next node instead of stopping the workflow."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000000012",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000013",
+      "name": "Feed returned items?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        620,
+        480
+      ],
+      "notes": "Guard: the feed returns a count field, so an unreachable or empty response ends the run quietly instead of throwing further down."
+    },
+    {
+      "parameters": {},
+      "id": "00000000-0000-4000-8000-000000000014",
+      "name": "Nothing new this run",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        840,
+        680
+      ],
+      "notes": "Normal outcome most of the time. Nothing to do."
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000015",
+      "name": "Split into one item per listing",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        840,
+        460
+      ],
+      "notes": "The feed returns one object with an items array; this turns it into one n8n item per listing."
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "logic": "removeItemsWithAlreadySeenKeyValues",
+        "dedupeValue": "={{ $json.permalink }}",
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000016",
+      "name": "Only listings not seen before",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        460
+      ],
+      "notes": "Remembers each listing's permalink across executions, so restarts and overlapping windows never re-announce a listing."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000000017",
+              "leftValue": "={{ $('Your settings').first().json.exchanges || $json.exchange }}",
+              "rightValue": "={{ $json.exchange }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000018",
+      "name": "Matches your exchange filter?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        460
+      ],
+      "notes": "Passes everything when exchanges is empty in settings, because the left side then falls back to this listing's own exchange."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000000019",
+              "leftValue": "={{ ($json.title.en || '') + ' ' + ($json.title.zh || '') + ' ' + ($json.title.ko || '') }}",
+              "rightValue": "={{ $('Your settings').first().json.keyword }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-00000000001a",
+      "name": "Matches your keyword filter?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        460
+      ],
+      "notes": "Passes everything when keyword is empty in settings. Matching runs against all three language titles at once."
+    },
+    {
+      "parameters": {},
+      "id": "00000000-0000-4000-8000-00000000001b",
+      "name": "Skipped by your filters",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        680
+      ],
+      "notes": "Listings that did not match. Kept as a separate branch so you can see what was filtered out in the execution log."
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00000000-0000-4000-8000-00000000001c",
+              "name": "headline",
+              "value": "={{ $json.title[$('Your settings').first().json.language] || $json.title.en || $json.title.zh || $json.title.ko }}",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000001d",
+              "name": "symbols_text",
+              "value": "={{ ($json.symbols || []).join(', ') }}",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000001e",
+              "name": "type_label",
+              "value": "={{ $json.type === 'futures' ? 'Futures' : 'Spot' }}",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-00000000001f",
+              "name": "minutes_old",
+              "value": "={{ Math.max(0, Math.round((Date.now() - new Date($json.published_at).getTime()) / 60000)) }}",
+              "type": "string"
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000020",
+              "name": "message",
+              "value": "=<b>{{ $json.exchange_name }}</b> · {{ $json.type === 'futures' ? 'Futures' : 'Spot' }} listing\n{{ ($json.title[$('Your settings').first().json.language] || $json.title.en || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }}\n{{ ($json.symbols || []).length ? '\\n' + ($json.symbols || []).join('  ') + '\\n' : '' }}\n<a href=\"{{ $json.source_url || $json.permalink }}\">Original announcement</a>",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000021",
+      "name": "Prepare alert fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1700,
+        460
+      ],
+      "notes": "Picks the headline in the language you chose, joins the token symbols, works out how old the announcement is, and composes the message once so every channel below can reuse it. HTML special characters are escaped."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000000022",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "futures",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000023",
+      "name": "Is it a futures listing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        300
+      ],
+      "notes": "Spot and futures deserve different wording, so they take separate branches."
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $('Your settings').first().json.telegram_chat_id }}",
+        "text": "=⚡ New futures listing\n\n{{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000024",
+      "name": "Send futures alert to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2120,
+        220
+      ],
+      "notes": "Select your Telegram Bot credential. The chat ID comes from Your settings, so you only set it in one place."
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "={{ $('Your settings').first().json.telegram_chat_id }}",
+        "text": "=🔔 New spot listing\n\n{{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000025",
+      "name": "Send spot alert to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2120,
+        380
+      ],
+      "notes": "Same credential and chat ID as the futures branch, different wording."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000000026",
+              "leftValue": "={{ $('Your settings').first().json.send_to_discord }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000027",
+      "name": "Also send to Discord?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        540
+      ],
+      "notes": "Optional. Off by default; set send_to_discord to true in Your settings to enable."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Your settings').first().json.discord_webhook_url }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=**{{ $json.exchange_name }}** · {{ $json.type_label }} listing\n{{ $json.headline }}\n{{ $json.symbols_text }}\n{{ $json.source_url || $json.permalink }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-000000000028",
+      "name": "Send to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2120,
+        540
+      ],
+      "notes": "Paste a Discord channel webhook URL into Your settings. A webhook URL needs no n8n credential."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "00000000-0000-4000-8000-000000000029",
+              "leftValue": "={{ $('Your settings').first().json.log_to_sheet }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-00000000002a",
+      "name": "Also log to Google Sheets?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        720
+      ],
+      "notes": "Optional. Off by default; set log_to_sheet to true in Your settings to enable."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_SPREADSHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Listings"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "00000000-0000-4000-8000-00000000002b",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2120,
+        720
+      ],
+      "notes": "Select a Google Sheets credential, set the spreadsheet ID, and create a sheet named Listings with a header row: exchange | exchange_name | type | symbols_text | headline | published_at | source_url | permalink."
+    }
+  ],
+  "connections": {
+    "Every 5 minutes": {
+      "main": [
+        [
+          {
+            "node": "Your settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your settings": {
+      "main": [
+        [
+          {
+            "node": "Fetch new listings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch new listings": {
+      "main": [
+        [
+          {
+            "node": "Feed returned items?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feed returned items?": {
+      "main": [
+        [
+          {
+            "node": "Split into one item per listing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nothing new this run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split into one item per listing": {
+      "main": [
+        [
+          {
+            "node": "Only listings not seen before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only listings not seen before": {
+      "main": [
+        [
+          {
+            "node": "Matches your exchange filter?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Matches your exchange filter?": {
+      "main": [
+        [
+          {
+            "node": "Matches your keyword filter?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skipped by your filters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Matches your keyword filter?": {
+      "main": [
+        [
+          {
+            "node": "Prepare alert fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skipped by your filters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare alert fields": {
+      "main": [
+        [
+          {
+            "node": "Is it a futures listing?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Also send to Discord?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Also log to Google Sheets?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is it a futures listing?": {
+      "main": [
+        [
+          {
+            "node": "Send futures alert to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send spot alert to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Also send to Discord?": {
+      "main": [
+        [
+          {
+            "node": "Send to Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Also log to Google Sheets?": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

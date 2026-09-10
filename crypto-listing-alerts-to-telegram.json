@@ -1,0 +1,234 @@
+{
+  "name": "Tokenearly: crypto listing alerts → Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tokenearly-alerts",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "6f3691b8-88a6-4fba-a127-db51f19350c0",
+      "name": "Tokenearly Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "71dffabe-27f6-4e00-85e9-e141f886f9e8",
+      "notes": "Paste this node's Production URL into Tokenearly → Dashboard → notification channels → Webhook."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cb0657a9-cc19-41c5-95ea-f61837268e04",
+              "leftValue": "={{ $json.headers.authorization }}",
+              "rightValue": "Bearer REPLACE_WITH_YOUR_TOKENEARLY_BEARER_TOKEN",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "134877ce-b109-4e5b-b0e0-87ed7ca7f3c7",
+      "name": "Check Bearer Token",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "notes": "Replace the right-hand value with the Bearer Token you set in the Tokenearly dashboard."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "7391be82-4c36-4868-b47c-dc8704a14c5a",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "list",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "8b7acc64-45d1-41c5-99fd-665514fa8226",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "上线",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cee9537c-64f6-472b-9039-7db37b7cdd44",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "上币",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "5bef639e-24ba-4a9b-b9b5-6cc7e8e2e1ca",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "新增",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "a5cd6998-3c8e-422d-9b59-d56a7a5a6bdb",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "상장",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "b5628004-5a93-4614-a460-569df315ac61",
+              "leftValue": "={{ $json.body.title + ' ' + $json.body.content }}",
+              "rightValue": "listing",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "541b549a-ba08-48f5-af26-541e07dfda2f",
+      "name": "Is Listing Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        520,
+        200
+      ],
+      "notes": "Passes alerts whose title or content contains a listing keyword (English, Chinese, Korean). Edit or remove to forward everything."
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_WITH_CHAT_ID",
+        "text": "=<b>{{ $json.body.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }}</b>\n{{ $json.body.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "7ebb8913-afb8-4ad8-9e80-7c69b87f8b40",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        200
+      ],
+      "notes": "Select your Telegram Bot credential and set the chat ID (user, group or channel). HTML special characters are escaped in the expression."
+    },
+    {
+      "parameters": {},
+      "id": "c2a97e3d-a72b-4cd6-92e2-69e8b0df4384",
+      "name": "Ignore (bad token)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        520,
+        460
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "455217a3-f81a-4275-a184-812bee465090",
+      "name": "Ignore (not a listing)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Tokenearly Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Bearer Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Bearer Token": {
+      "main": [
+        [
+          {
+            "node": "Is Listing Alert?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore (bad token)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Listing Alert?": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignore (not a listing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Receives Tokenearly webhook alerts, verifies the Bearer Token, keeps listing-related alerts and sends them to a Telegram chat."
+  },
+  "tags": []
+}
