@@ -123,6 +123,20 @@ Google Sheets 워크플로에서 사용하는 파생 값:
 
 공개 API는 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)으로 배포됩니다. 제목, 분류, 시각, 토큰 심볼, 원문 공지 링크를 포함하며 공지 본문은 재배포하지 않습니다. 표기 방식: *Data by Tokenearly (https://tokenearly.com)*. 프로그램과 AI 에이전트를 위한 안내는 `https://tokenearly.com/llms.txt`에 있습니다.
 
+## 관련 프로젝트
+
+Tokenearly가 공개한 모든 자산입니다. 상황에 맞는 진입점을 고르십시오:
+
+- 웹사이트: [Tokenearly](https://tokenearly.com) — 암호화폐 거래소 토큰 상장 공지, 뉴스, X 활동 실시간 알림. [상장 타임라인](https://tokenearly.com/listings)과 [공개 상장 피드](https://tokenearly.com/api/public/listings.json)(JSON, 키 불필요)도 참고하십시오.
+- Python 패키지: [PyPI의 tokenearly](https://pypi.org/project/tokenearly/)([소스](https://github.com/tokenearly/tokenearly-python)) — `pip install tokenearly`, 공개 상장 피드를 읽는 명령줄 도구와 Python 클라이언트.
+- Node.js 패키지: [npm의 tokenearly](https://www.npmjs.com/package/tokenearly)([소스](https://github.com/tokenearly/tokenearly-js)) — `npm install tokenearly`, 의존성 없는 명령줄 도구와 Node.js 클라이언트.
+- n8n.io의 이 템플릿: [10개 암호화폐 거래소의 신규 토큰 상장 알림을 Telegram, Discord, Google Sheets로 보내기](https://n8n.io/workflows/19448-send-new-token-listing-alerts-from-10-crypto-exchanges-to-telegram-discord-and-google-sheets/) — 이 저장소의 공개 피드 워크플로, 바로 가져올 수 있습니다.
+- Webhook 수신 서버: [webhook-examples](https://github.com/tokenearly/webhook-examples) — Tokenearly Webhook 페이로드 명세와 FastAPI, Express, Cloudflare Workers 수신 예제.
+- Signal SDK: [signal-sdk](https://github.com/tokenearly/signal-sdk) — 자체 시그널을 Tokenearly로 보내는 Python 및 TypeScript 클라이언트.
+- 자료 모음: [awesome-crypto-listing-alerts](https://github.com/tokenearly/awesome-crypto-listing-alerts) — 거래소 공식 공지 페이지, 상장 알림 도구, 오픈소스 봇, 상장 효과 연구 모음.
+- GitHub 조직: [github.com/tokenearly](https://github.com/tokenearly) — 모든 저장소(조직 프로필: [.github](https://github.com/tokenearly/.github)).
+- Telegram: 공식 채널 [@tokenearly_channel](https://t.me/tokenearly_channel), 공식 봇 [@tokenearly_bot](https://t.me/tokenearly_bot).
+
 ## 라이선스
 
 MIT © Tokenearly
