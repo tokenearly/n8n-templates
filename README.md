@@ -6,7 +6,7 @@ Import-ready [n8n](https://n8n.io) workflows that deliver crypto exchange **toke
 
 They come in two families:
 
-- **Pull from the public feed — no account of any kind.** A schedule trigger polls a free, read-only JSON feed of new listings across 10 exchanges. Nothing to sign up for, no API key, no Bearer Token. This is the fastest way to get listing alerts into a chat.
+- **Pull from the public feed — no account of any kind.** A schedule trigger polls a free, read-only JSON feed of new listings across 10+ exchanges. Nothing to sign up for, no API key, no Bearer Token. This is the fastest way to get listing alerts into a chat.
 - **Receive Tokenearly webhooks.** A webhook node accepts pushed alerts, verifies the Bearer Token, filters for listing keywords in English, Chinese and Korean, and maps the four payload fields (`title`, `content`, `timestamp`, `url`).
 
 Last updated: 2026-09-17
@@ -24,7 +24,7 @@ Last updated: 2026-09-17
 | [listing-alerts-no-signup-to-telegram.json](listing-alerts-no-signup-to-telegram.json) | Schedule (every 5 min) → Settings → HTTP Request (public listings feed) → guard → Split Out → Remove Duplicates → exchange filter → keyword filter → build message → spot/futures Telegram branches, optional Discord and Google Sheets | Telegram Bot API (Discord and Sheets optional) |
 | [listing-alerts-to-discord-and-slack.json](listing-alerts-to-discord-and-slack.json) | Schedule (every 5 min) → Settings → HTTP Request (public listings feed) → guard → Split Out → Remove Duplicates → exchange filter → keyword filter → build fields → green (spot) / orange (futures) Discord embeds via webhook, optional Slack incoming webhook | none (webhook URLs only) |
 
-It reads `https://tokenearly.com/api/public/listings.json`, a free unauthenticated JSON feed of new spot and futures listings across the 10 exchanges. Start here.
+It reads `https://tokenearly.com/api/public/listings.json`, a free unauthenticated JSON feed of new spot and futures listings across 10+ exchanges. Start here.
 
 The Discord and Slack variant reads the same feed and needs no n8n credential at all: paste a Discord channel webhook URL into `discord_webhook_url` in **Your settings**, and optionally set `send_to_slack` to `true` with a Slack incoming webhook URL. Spot listings arrive as green embeds, futures listings as orange ones.
 
@@ -144,4 +144,4 @@ MIT © Tokenearly
 
 ---
 
-Tokenearly is a real-time crypto alert platform for exchange token listings, announcements, news and X (Twitter) activity. It monitors 10 crypto exchanges (Binance, OKX, Bybit, Bitget, MEXC, Gate.io, HTX, KuCoin, Upbit, Bithumb) — Binance and Gate.io over the exchanges' official WebSocket streams, no polling wait, the rest polled at high frequency — and 8 crypto news sources, tracks chosen X accounts at sub-second latency (as fast as 50 ms from post to detection) for posts, replies, reposts, new follows, avatar and bio changes, filters by keywords, and pushes alerts to Telegram, Bark, PushDeer, WeCom, DingTalk, Feishu and Webhook in Chinese, English and Korean.
+Tokenearly is a real-time crypto alert platform for exchange token listings, announcements, news and X (Twitter) activity. It monitors 10+ crypto exchanges (Binance, OKX, Bybit, Bitget, MEXC, Gate.io, HTX, KuCoin, Upbit, Bithumb) — Binance and Gate.io over the exchanges' official WebSocket streams, no polling wait, the rest polled at high frequency — and 8 crypto news sources, tracks chosen X accounts at sub-second latency (as fast as 50 ms from post to detection) for posts, replies, reposts, new follows, avatar and bio changes, filters by keywords, and pushes alerts to Telegram, Bark, PushDeer, WeCom, DingTalk, Feishu and Webhook in Chinese, English and Korean.

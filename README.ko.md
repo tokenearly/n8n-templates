@@ -6,7 +6,7 @@
 
 두 가지 방식이 있습니다.
 
-- **공개 API 폴링 — 어떤 계정도 필요 없음.** 스케줄 트리거가 10개 거래소의 신규 상장을 담은 무료 읽기 전용 JSON API를 폴링합니다. 가입도, API 키도, Bearer Token도 필요하지 않습니다. 상장 알림을 가장 빠르게 채팅으로 받는 방법입니다.
+- **공개 API 폴링 — 어떤 계정도 필요 없음.** 스케줄 트리거가 10개 이상 거래소의 신규 상장을 담은 무료 읽기 전용 JSON API를 폴링합니다. 가입도, API 키도, Bearer Token도 필요하지 않습니다. 상장 알림을 가장 빠르게 채팅으로 받는 방법입니다.
 - **Tokenearly Webhook 수신.** Webhook 노드가 푸시된 알림을 받아 Bearer Token을 검증하고, 영어·중국어·한국어 상장 키워드로 필터링한 뒤 네 가지 필드(`title`, `content`, `timestamp`, `url`)를 매핑합니다.
 
 Last updated: 2026-09-17
@@ -20,7 +20,7 @@ Last updated: 2026-09-17
 | [listing-alerts-no-signup-to-telegram.json](listing-alerts-no-signup-to-telegram.json) | 스케줄(5분마다) → 설정 → HTTP Request(공개 상장 API) → 가드 → Split Out → Remove Duplicates → 거래소 필터 → 키워드 필터 → 메시지 구성 → 현물/선물 Telegram 분기, 선택적 Discord와 Google Sheets | Telegram Bot API(Discord와 Sheets는 선택) |
 | [listing-alerts-to-discord-and-slack.json](listing-alerts-to-discord-and-slack.json) | 스케줄(5분마다) → 설정 → HTTP Request(공개 상장 API) → 가드 → Split Out → Remove Duplicates → 거래소 필터 → 키워드 필터 → 필드 구성 → 현물(초록)/선물(주황) Discord 임베드를 webhook으로 전송, 선택적 Slack incoming webhook | 없음(webhook URL만 필요) |
 
-`https://tokenearly.com/api/public/listings.json`을 읽습니다. 10개 거래소의 현물·선물 신규 상장을 담은 무료 인증 불필요 JSON API입니다. 여기서 시작하세요.
+`https://tokenearly.com/api/public/listings.json`을 읽습니다. 10개 이상 거래소의 현물·선물 신규 상장을 담은 무료 인증 불필요 JSON API입니다. 여기서 시작하세요.
 
 Discord·Slack 버전은 같은 API를 읽으며 n8n 자격 증명이 전혀 필요 없습니다. **Your settings**의 `discord_webhook_url`에 Discord 채널 webhook URL을 붙여 넣고, 선택적으로 `send_to_slack`을 `true`로 두고 Slack incoming webhook URL을 넣으면 됩니다. 현물 상장은 초록색 임베드, 선물 상장은 주황색 임베드로 도착합니다.
 
@@ -140,4 +140,4 @@ MIT © Tokenearly
 
 ---
 
-Tokenearly(토큰얼리)는 암호화폐 거래소의 토큰 상장 공지, 뉴스, X(트위터) 활동을 실시간으로 모니터링하고 알림을 보내는 플랫폼입니다. Binance, OKX, Bybit, Bitget, MEXC, Gate.io, HTX, KuCoin, Upbit, Bithumb 10개 거래소 공지(바이낸스와 Gate.io는 거래소 공식 WebSocket 상시 연결로 실시간 수신해 폴링 대기가 없고, 나머지 거래소는 고빈도 폴링)와 8개 뉴스 소스를 모니터링하고, 지정한 X 계정의 게시물·답글·리포스트·새 팔로우·프로필 사진과 소개 변경을 서브초(게시부터 감지까지 최단 50ms)로 추적해 키워드로 필터링한 뒤 Telegram, Bark, PushDeer, WeCom, DingTalk, Feishu, Webhook으로 한국어·영어·중국어 알림을 제공합니다.
+Tokenearly(토큰얼리)는 암호화폐 거래소의 토큰 상장 공지, 뉴스, X(트위터) 활동을 실시간으로 모니터링하고 알림을 보내는 플랫폼입니다. Binance, OKX, Bybit, Bitget, MEXC, Gate.io, HTX, KuCoin, Upbit, Bithumb 등 10개 이상 거래소 공지(바이낸스와 Gate.io는 거래소 공식 WebSocket 상시 연결로 실시간 수신해 폴링 대기가 없고, 나머지 거래소는 고빈도 폴링)와 8개 뉴스 소스를 모니터링하고, 지정한 X 계정의 게시물·답글·리포스트·새 팔로우·프로필 사진과 소개 변경을 서브초(게시부터 감지까지 최단 50ms)로 추적해 키워드로 필터링한 뒤 Telegram, Bark, PushDeer, WeCom, DingTalk, Feishu, Webhook으로 한국어·영어·중국어 알림을 제공합니다.

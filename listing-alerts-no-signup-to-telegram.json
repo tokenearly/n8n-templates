@@ -2,7 +2,7 @@
   "meta": {
     "templateCredsSetupCompleted": false
   },
-  "name": "Send new token listing alerts from 10 crypto exchanges to Telegram, Discord, and Sheets",
+  "name": "Send new token listing alerts from 10+ crypto exchanges to Telegram, Discord, and Sheets",
   "tags": [],
   "nodes": [
     {
@@ -17,7 +17,7 @@
         "color": 1,
         "width": 1000,
         "height": 800,
-        "content": "## Crypto exchange listing alerts, no account needed\n\nWatches 10 crypto exchanges and posts every new token listing to Telegram, with optional Discord and Google Sheets copies.\n\n### How it works\n\n1. **Every 5 minutes** starts the run.\n2. **Your settings** holds everything you might want to change: which exchanges, spot or futures, a keyword filter, how far back to look, and whether to also send to Discord or log to a sheet.\n3. **Fetch new listings** calls a free, public, read-only JSON feed. No account, no API key, no token.\n4. **Feed returned items?** guards the rest of the run, so an empty or failed response ends quietly instead of throwing.\n5. **Only listings not seen before** remembers each listing's permalink across executions, so a restart or an overlapping window never re-announces one.\n6. Two filters narrow the stream to the exchanges and keywords you care about.\n7. **Prepare alert fields** picks the headline in your language and builds the message.\n8. Spot and futures listings take separate Telegram branches so each reads differently.\n\n### Setup\n\n1. Add a **Telegram** credential, using a bot token from @BotFather.\n2. Open **Your settings** and set `telegram_chat_id` to your chat, group or channel ID.\n3. Leave `send_to_discord` and `log_to_sheet` as `false` unless you want them. To use them, paste a Discord webhook URL, or pick a Google Sheets credential and set the spreadsheet ID.\n4. Save, then activate the workflow.\n\n### Customization tips\n\nNarrow the feed with `exchanges` (`binance,okx`) or `listing_type` (`spot` or `futures`). Raise `lookback_days` up to 30 to backfill on the first run. Titles arrive in three languages, so `title.en`, `title.zh` and `title.ko` are all available."
+        "content": "## Crypto exchange listing alerts, no account needed\n\nWatches 10+ crypto exchanges and posts every new token listing to Telegram, with optional Discord and Google Sheets copies.\n\n### How it works\n\n1. **Every 5 minutes** starts the run.\n2. **Your settings** holds everything you might want to change: which exchanges, spot or futures, a keyword filter, how far back to look, and whether to also send to Discord or log to a sheet.\n3. **Fetch new listings** calls a free, public, read-only JSON feed. No account, no API key, no token.\n4. **Feed returned items?** guards the rest of the run, so an empty or failed response ends quietly instead of throwing.\n5. **Only listings not seen before** remembers each listing's permalink across executions, so a restart or an overlapping window never re-announces one.\n6. Two filters narrow the stream to the exchanges and keywords you care about.\n7. **Prepare alert fields** picks the headline in your language and builds the message.\n8. Spot and futures listings take separate Telegram branches so each reads differently.\n\n### Setup\n\n1. Add a **Telegram** credential, using a bot token from @BotFather.\n2. Open **Your settings** and set `telegram_chat_id` to your chat, group or channel ID.\n3. Leave `send_to_discord` and `log_to_sheet` as `false` unless you want them. To use them, paste a Discord webhook URL, or pick a Google Sheets credential and set the spreadsheet ID.\n4. Save, then activate the workflow.\n\n### Customization tips\n\nNarrow the feed with `exchanges` (`binance,okx`) or `listing_type` (`spot` or `futures`). Raise `lookback_days` up to 30 to backfill on the first run. Titles arrive in three languages, so `title.en`, `title.zh` and `title.ko` are all available."
       },
       "typeVersion": 1
     },
@@ -183,7 +183,7 @@
       "id": "00000000-0000-4000-8000-000000000011",
       "name": "Fetch new listings",
       "type": "n8n-nodes-base.httpRequest",
-      "notes": "A free, public, read-only JSON feed of new token listings across 10 exchanges. No account and no API key. neverError is on so a bad response is handled by the next node instead of stopping the workflow.",
+      "notes": "A free, public, read-only JSON feed of new token listings across 10+ exchanges. No account and no API key. neverError is on so a bad response is handled by the next node instead of stopping the workflow.",
       "position": [
         400,
         600

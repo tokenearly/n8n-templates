@@ -2,7 +2,7 @@
  "meta": {
   "templateCredsSetupCompleted": false
  },
- "name": "Send new token listing alerts from 10 crypto exchanges to Discord and Slack",
+ "name": "Send new token listing alerts from 10+ crypto exchanges to Discord and Slack",
  "tags": [],
  "nodes": [
   {
@@ -17,7 +17,7 @@
     "color": 1,
     "width": 1000,
     "height": 800,
-    "content": "## Crypto exchange listing alerts for Discord, no account needed\n\nWatches 10 crypto exchanges and posts every new token listing to a Discord channel as a color-coded embed, with an optional Slack copy.\n\n### How it works\n\n1. **Every 5 minutes** starts the run.\n2. **Your settings** holds everything you might want to change: the Discord webhook, exchanges, spot or futures, a keyword filter, lookback window, headline language, and the Slack switch.\n3. **Fetch new listings** calls a free, public, read-only JSON feed. No account, no API key, no token.\n4. **Feed returned items?** ends an empty or failed run quietly instead of throwing.\n5. **Only listings not seen before** remembers each permalink across executions, so a restart never re-announces a listing.\n6. Two filters narrow the stream to the exchanges and keywords you care about.\n7. **Prepare alert fields** picks the headline in your language and builds the fields both channels reuse.\n8. Spot listings post as a green embed, futures listings as an orange one. Slack stays off until you enable it.\n\n### Setup\n\n1. In Discord open your channel settings, then Integrations, then Webhooks, and copy a webhook URL.\n2. Open **Your settings** and paste it into `discord_webhook_url`.\n3. Optional: set `send_to_slack` to `true` and paste a Slack incoming webhook URL into `slack_webhook_url`.\n4. Save, then activate the workflow. No n8n credential is required anywhere.\n\n### Customization tips\n\nNarrow the feed with `exchanges` (`binance,okx`) or `listing_type` (`spot` or `futures`). Raise `lookback_days` up to 30 to backfill on the first run. Titles arrive in three languages, so set `language` to `en`, `zh` or `ko`."
+    "content": "## Crypto exchange listing alerts for Discord, no account needed\n\nWatches 10+ crypto exchanges and posts every new token listing to a Discord channel as a color-coded embed, with an optional Slack copy.\n\n### How it works\n\n1. **Every 5 minutes** starts the run.\n2. **Your settings** holds everything you might want to change: the Discord webhook, exchanges, spot or futures, a keyword filter, lookback window, headline language, and the Slack switch.\n3. **Fetch new listings** calls a free, public, read-only JSON feed. No account, no API key, no token.\n4. **Feed returned items?** ends an empty or failed run quietly instead of throwing.\n5. **Only listings not seen before** remembers each permalink across executions, so a restart never re-announces a listing.\n6. Two filters narrow the stream to the exchanges and keywords you care about.\n7. **Prepare alert fields** picks the headline in your language and builds the fields both channels reuse.\n8. Spot listings post as a green embed, futures listings as an orange one. Slack stays off until you enable it.\n\n### Setup\n\n1. In Discord open your channel settings, then Integrations, then Webhooks, and copy a webhook URL.\n2. Open **Your settings** and paste it into `discord_webhook_url`.\n3. Optional: set `send_to_slack` to `true` and paste a Slack incoming webhook URL into `slack_webhook_url`.\n4. Save, then activate the workflow. No n8n credential is required anywhere.\n\n### Customization tips\n\nNarrow the feed with `exchanges` (`binance,okx`) or `listing_type` (`spot` or `futures`). Raise `lookback_days` up to 30 to backfill on the first run. Titles arrive in three languages, so set `language` to `en`, `zh` or `ko`."
    },
    "typeVersion": 1
   },
@@ -177,7 +177,7 @@
    "id": "00000000-0000-4000-8000-000000000012",
    "name": "Fetch new listings",
    "type": "n8n-nodes-base.httpRequest",
-   "notes": "A free, public, read-only JSON feed of new token listings across 10 exchanges. No account and no API key. Only days and type are sent as query parameters; the exchange list is applied by the filter node below. neverError is on so a bad response is handled by the next node instead of stopping the workflow.",
+   "notes": "A free, public, read-only JSON feed of new token listings across 10+ exchanges. No account and no API key. Only days and type are sent as query parameters; the exchange list is applied by the filter node below. neverError is on so a bad response is handled by the next node instead of stopping the workflow.",
    "position": [
     400,
     600

@@ -6,7 +6,7 @@
 
 分两类：
 
-- **拉取公开接口——不需要注册任何账号。** 用定时触发器轮询一个免费只读的上新 JSON 接口，覆盖 10 家交易所。无需注册、无需 API key、无需 Bearer Token。想最快把上新提醒接进聊天工具，选这个。
+- **拉取公开接口——不需要注册任何账号。** 用定时触发器轮询一个免费只读的上新 JSON 接口，覆盖 10+ 家交易所。无需注册、无需 API key、无需 Bearer Token。想最快把上新提醒接进聊天工具，选这个。
 - **接收 Tokenearly Webhook 推送。** 用 Webhook 节点接收推送，校验 Bearer Token，按中英韩三语的上新关键词过滤，并映射四个字段（`title`、`content`、`timestamp`、`url`）。
 
 Last updated: 2026-09-17
@@ -20,7 +20,7 @@ Last updated: 2026-09-17
 | [listing-alerts-no-signup-to-telegram.json](listing-alerts-no-signup-to-telegram.json) | 定时触发（每 5 分钟）→ 设置 → HTTP Request（公开上新接口）→ 守卫 → Split Out → Remove Duplicates → 交易所过滤 → 关键词过滤 → 组装消息 → 现货/合约分支发 Telegram，可选 Discord 与 Google Sheets | Telegram Bot API（Discord 与 Sheets 可选） |
 | [listing-alerts-to-discord-and-slack.json](listing-alerts-to-discord-and-slack.json) | 定时触发（每 5 分钟）→ 设置 → HTTP Request（公开上新接口）→ 守卫 → Split Out → Remove Duplicates → 交易所过滤 → 关键词过滤 → 组装字段 → 现货（绿色）/合约（橙色）Discord 嵌入消息经 webhook 发送，可选 Slack incoming webhook | 无（仅需 webhook URL） |
 
-它读取 `https://tokenearly.com/api/public/listings.json`——一个免鉴权的免费 JSON 接口，包含 10 家交易所的现货与合约上新。建议从这个模板开始。
+它读取 `https://tokenearly.com/api/public/listings.json`——一个免鉴权的免费 JSON 接口，包含 10+ 家交易所的现货与合约上新。建议从这个模板开始。
 
 Discord 与 Slack 版本读取同一个接口，完全不需要 n8n 凭据：在 **Your settings** 的 `discord_webhook_url` 里粘贴 Discord 频道 webhook URL，可选把 `send_to_slack` 设为 `true` 并填入 Slack incoming webhook URL。现货上新为绿色嵌入消息，合约上新为橙色。
 
@@ -127,7 +127,7 @@ Tokenearly 公开的全部资产，按需选择入口：
 - 网站：[Tokenearly](https://tokenearly.com) —— 加密资产交易所上新公告、资讯与推特动态的实时提醒；另见[上新时间线](https://tokenearly.com/listings)与[公开上新接口](https://tokenearly.com/api/public/listings.json)（JSON，无需密钥）。
 - Python 包：[PyPI 上的 tokenearly](https://pypi.org/project/tokenearly/)（[源码](https://github.com/tokenearly/tokenearly-python)）—— `pip install tokenearly`，读取公开上新接口的命令行与 Python 客户端。
 - Node.js 包：[npm 上的 tokenearly](https://www.npmjs.com/package/tokenearly)（[源码](https://github.com/tokenearly/tokenearly-js)）—— `npm install tokenearly`，零依赖的命令行与 Node.js 客户端。
-- n8n.io 上的本模板：[将 10 家交易所的新币上线提醒发送到 Telegram、Discord 和 Google Sheets](https://n8n.io/workflows/19448-send-new-token-listing-alerts-from-10-crypto-exchanges-to-telegram-discord-and-google-sheets/) —— 本仓库的公开接口工作流，可直接导入。
+- n8n.io 上的本模板：[将 10+ 家交易所的新币上线提醒发送到 Telegram、Discord 和 Google Sheets](https://n8n.io/workflows/19448-send-new-token-listing-alerts-from-10-crypto-exchanges-to-telegram-discord-and-google-sheets/) —— 本仓库的公开接口工作流，可直接导入。
 - Webhook 接收端：[webhook-examples](https://github.com/tokenearly/webhook-examples) —— Tokenearly Webhook 推送格式说明，以及 FastAPI、Express、Cloudflare Workers 接收端示例。
 - 信号 SDK：[signal-sdk](https://github.com/tokenearly/signal-sdk) —— 把你自己的信号推送进 Tokenearly 的 Python 与 TypeScript 客户端。
 - 资源清单：[awesome-crypto-listing-alerts](https://github.com/tokenearly/awesome-crypto-listing-alerts) —— 交易所官方公告页、上新提醒工具、开源机器人与上新效应研究的精选清单。
@@ -140,4 +140,4 @@ MIT © Tokenearly
 
 ---
 
-Tokenearly（斥候）是加密资产交易所上新公告、资讯与推特动态的实时监控推送平台：监控 Binance、OKX、Bybit、Bitget、MEXC、Gate.io、HTX、KuCoin、Upbit、Bithumb 10 家交易所公告（币安与 Gate.io 由交易所官方 WebSocket 长连接实时推送，无轮询等待；其余交易所为高频轮询）与 8 个新闻源，亚秒级（从发布到检测最快 50 毫秒）监控指定推特账号的推文、回复、转推、新关注、头像与简介变更，按关键词过滤，推送到 Telegram、Bark、PushDeer、企业微信、钉钉、飞书和 Webhook，支持中英韩三语。
+Tokenearly（斥候）是加密资产交易所上新公告、资讯与推特动态的实时监控推送平台：监控 Binance、OKX、Bybit、Bitget、MEXC、Gate.io、HTX、KuCoin、Upbit、Bithumb 等 10+ 家交易所公告（币安与 Gate.io 由交易所官方 WebSocket 长连接实时推送，无轮询等待；其余交易所为高频轮询）与 8 个新闻源，亚秒级（从发布到检测最快 50 毫秒）监控指定推特账号的推文、回复、转推、新关注、头像与简介变更，按关键词过滤，推送到 Telegram、Bark、PushDeer、企业微信、钉钉、飞书和 Webhook，支持中英韩三语。
