@@ -25,13 +25,7 @@ Last updated: 2026-09-10
 
 ### Tokenearly Webhook 수신
 
-| 파일 | 흐름 | 필요한 자격 증명 |
-|---|---|---|
-| [crypto-listing-alerts-to-telegram.json](crypto-listing-alerts-to-telegram.json) | Webhook → Check Bearer Token → Is Listing Alert? → Telegram(HTML 메시지) | Telegram Bot API |
-| [crypto-listing-alerts-to-discord-and-slack.json](crypto-listing-alerts-to-discord-and-slack.json) | Webhook → Check Bearer Token → Is Listing Alert? → Discord webhook + Slack incoming webhook(HTTP Request 노드) | 없음(webhook URL만 필요) |
-| [new-listing-to-google-sheets.json](new-listing-to-google-sheets.json) | Webhook → Check Bearer Token → Is Listing Alert? → Map Fields → Google Sheets 행 추가 | Google Sheets OAuth2 |
-
-이 세 워크플로는 모두 Webhook을 수신하는 즉시 Tokenearly에 `200`을 응답하므로(`responseMode: onReceived`), 전달 과정이 Tokenearly의 10초 타임아웃에 걸리는 일이 없습니다.
+Webhook을 수신하는 워크플로 파일은 아직 이 저장소에 포함되어 있지 않습니다. 아래 Webhook 관련 절은 직접 구성하는 방법을 설명합니다. Bearer Token을 검증하고, 상장 키워드로 필터링하고, 네 가지 페이로드 필드를 매핑하며, Webhook을 수신하는 즉시 `200`을 응답해(`responseMode: onReceived`) Tokenearly의 10초 타임아웃에 걸리지 않도록 합니다. n8n 밖에서 바로 실행할 수 있는 수신 서버는 [webhook-examples](https://github.com/tokenearly/webhook-examples)에 있습니다.
 
 ## 가져오기 절차 — 공개 API 워크플로
 
@@ -54,7 +48,7 @@ Last updated: 2026-09-10
 
 ## 가져오기 절차 — Webhook 워크플로
 
-1. n8n에서 **Workflows → Add workflow → ⋯ → Import from file**을 열고 JSON 파일 중 하나를 선택합니다(n8n 1.x).
+1. n8n에서 **Workflows → Add workflow → ⋯ → Import from file**을 열고 사용할 Webhook 워크플로 JSON 파일을 선택합니다(n8n 1.x).
 2. **Check Bearer Token** 노드를 열어 `REPLACE_WITH_YOUR_TOKENEARLY_BEARER_TOKEN`을 충분히 긴 임의의 문자열로 바꿉니다. 같은 문자열을 Tokenearly에도 입력하게 됩니다.
 3. 대상 채널을 설정합니다.
    - Telegram: Telegram Bot 자격 증명을 선택(또는 생성)하고 *Send to Telegram* 노드에서 **Chat ID**를 설정합니다.

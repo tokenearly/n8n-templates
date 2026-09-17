@@ -25,13 +25,7 @@ Last updated: 2026-09-10
 
 ### 接收 Tokenearly Webhook 推送
 
-| 文件 | 流程 | 所需凭据 |
-|---|---|---|
-| [crypto-listing-alerts-to-telegram.json](crypto-listing-alerts-to-telegram.json) | Webhook → Check Bearer Token → Is Listing Alert? → Telegram（HTML 消息） | Telegram Bot API |
-| [crypto-listing-alerts-to-discord-and-slack.json](crypto-listing-alerts-to-discord-and-slack.json) | Webhook → Check Bearer Token → Is Listing Alert? → Discord webhook + Slack incoming webhook（HTTP Request 节点） | 无（仅需 webhook URL） |
-| [new-listing-to-google-sheets.json](new-listing-to-google-sheets.json) | Webhook → Check Bearer Token → Is Listing Alert? → Map Fields → Google Sheets 追加写入 | Google Sheets OAuth2 |
-
-这三个工作流都会在收到 Webhook 后立即向 Tokenearly 返回 `200`（`responseMode: onReceived`），因此后续转发不会触发 Tokenearly 的 10 秒超时。
+本仓库暂未收录接收 Webhook 的工作流文件。下面的 Webhook 相关章节说明如何自行接线：校验 Bearer Token、按上新关键词过滤、映射四个推送字段，并在收到 Webhook 后立即返回 `200`（`responseMode: onReceived`），避免触发 Tokenearly 的 10 秒超时。n8n 之外可直接运行的接收端见 [webhook-examples](https://github.com/tokenearly/webhook-examples)。
 
 ## 导入步骤——公开接口工作流
 
@@ -54,7 +48,7 @@ Last updated: 2026-09-10
 
 ## 导入步骤——Webhook 工作流
 
-1. 在 n8n 中打开 **Workflows → Add workflow → ⋯ → Import from file**，选择其中一个 JSON 文件（n8n 1.x）。
+1. 在 n8n 中打开 **Workflows → Add workflow → ⋯ → Import from file**，选择你的 Webhook 工作流 JSON 文件（n8n 1.x）。
 2. 打开 **Check Bearer Token** 节点，把 `REPLACE_WITH_YOUR_TOKENEARLY_BEARER_TOKEN` 替换为一段足够长的随机字符串。稍后需要在 Tokenearly 中填入同一字符串。
 3. 配置目标渠道：
    - Telegram：选择（或新建）一个 Telegram Bot 凭据，并在 *Send to Telegram* 节点上设置 **Chat ID**。

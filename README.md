@@ -29,13 +29,7 @@ Everything you may want to change sits in one **Your settings** node: which exch
 
 ### Receive Tokenearly webhooks
 
-| File | Flow | Credentials needed |
-|---|---|---|
-| [crypto-listing-alerts-to-telegram.json](crypto-listing-alerts-to-telegram.json) | Webhook → Check Bearer Token → Is Listing Alert? → Telegram (HTML message) | Telegram Bot API |
-| [crypto-listing-alerts-to-discord-and-slack.json](crypto-listing-alerts-to-discord-and-slack.json) | Webhook → Check Bearer Token → Is Listing Alert? → Discord webhook + Slack incoming webhook (HTTP Request nodes) | none (webhook URLs only) |
-| [new-listing-to-google-sheets.json](new-listing-to-google-sheets.json) | Webhook → Check Bearer Token → Is Listing Alert? → Map Fields → Google Sheets append | Google Sheets OAuth2 |
-
-These three respond `200` to Tokenearly as soon as the webhook is received (`responseMode: onReceived`), so forwarding never hits Tokenearly's 10-second timeout.
+Webhook-receiving workflow files are not included in this repository yet. The webhook sections below describe how to wire one yourself: verify the Bearer Token, filter for listing keywords, map the four payload fields, and answer `200` as soon as the webhook is received (`responseMode: onReceived`) so forwarding never hits Tokenearly's 10-second timeout. Ready-to-run receivers outside n8n are in [webhook-examples](https://github.com/tokenearly/webhook-examples).
 
 ## Import steps — public feed workflow
 
@@ -58,7 +52,7 @@ Everything else is optional and lives in the same **Your settings** node:
 
 ## Import steps — webhook workflows
 
-1. In n8n open **Workflows → Add workflow → ⋯ → Import from file** and pick one of the JSON files (n8n 1.x).
+1. In n8n open **Workflows → Add workflow → ⋯ → Import from file** and pick your webhook workflow JSON (n8n 1.x).
 2. Open **Check Bearer Token** and replace `REPLACE_WITH_YOUR_TOKENEARLY_BEARER_TOKEN` with a long random string. You will enter the same string in Tokenearly.
 3. Configure the destination:
    - Telegram: select (or create) a Telegram Bot credential and set **Chat ID** on *Send to Telegram*.
