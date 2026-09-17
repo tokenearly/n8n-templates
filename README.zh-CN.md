@@ -9,7 +9,7 @@
 - **拉取公开接口——不需要注册任何账号。** 用定时触发器轮询一个免费只读的上新 JSON 接口，覆盖 10 家交易所。无需注册、无需 API key、无需 Bearer Token。想最快把上新提醒接进聊天工具，选这个。
 - **接收 Tokenearly Webhook 推送。** 用 Webhook 节点接收推送，校验 Bearer Token，按中英韩三语的上新关键词过滤，并映射四个字段（`title`、`content`、`timestamp`、`url`）。
 
-Last updated: 2026-09-10
+Last updated: 2026-09-17
 
 ## 工作流
 
@@ -18,8 +18,11 @@ Last updated: 2026-09-10
 | 文件 | 流程 | 所需凭据 |
 |---|---|---|
 | [listing-alerts-no-signup-to-telegram.json](listing-alerts-no-signup-to-telegram.json) | 定时触发（每 5 分钟）→ 设置 → HTTP Request（公开上新接口）→ 守卫 → Split Out → Remove Duplicates → 交易所过滤 → 关键词过滤 → 组装消息 → 现货/合约分支发 Telegram，可选 Discord 与 Google Sheets | Telegram Bot API（Discord 与 Sheets 可选） |
+| [listing-alerts-to-discord-and-slack.json](listing-alerts-to-discord-and-slack.json) | 定时触发（每 5 分钟）→ 设置 → HTTP Request（公开上新接口）→ 守卫 → Split Out → Remove Duplicates → 交易所过滤 → 关键词过滤 → 组装字段 → 现货（绿色）/合约（橙色）Discord 嵌入消息经 webhook 发送，可选 Slack incoming webhook | 无（仅需 webhook URL） |
 
 它读取 `https://tokenearly.com/api/public/listings.json`——一个免鉴权的免费 JSON 接口，包含 10 家交易所的现货与合约上新。建议从这个模板开始。
+
+Discord 与 Slack 版本读取同一个接口，完全不需要 n8n 凭据：在 **Your settings** 的 `discord_webhook_url` 里粘贴 Discord 频道 webhook URL，可选把 `send_to_slack` 设为 `true` 并填入 Slack incoming webhook URL。现货上新为绿色嵌入消息，合约上新为橙色。
 
 所有你可能想改的东西都集中在一个 **Your settings** 节点里：监控哪些交易所、只要现货还是只要合约、关键词过滤、回看多少天、消息用哪种语言、以及是否同时发 Discord 或写入表格。*Remove Duplicates* 会记住已处理过的每个 `permalink`，重启也不会重复提醒；守卫节点会在接口无返回时安静结束这一轮。
 

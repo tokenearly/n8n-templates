@@ -9,7 +9,7 @@ They come in two families:
 - **Pull from the public feed — no account of any kind.** A schedule trigger polls a free, read-only JSON feed of new listings across 10 exchanges. Nothing to sign up for, no API key, no Bearer Token. This is the fastest way to get listing alerts into a chat.
 - **Receive Tokenearly webhooks.** A webhook node accepts pushed alerts, verifies the Bearer Token, filters for listing keywords in English, Chinese and Korean, and maps the four payload fields (`title`, `content`, `timestamp`, `url`).
 
-Last updated: 2026-09-10
+Last updated: 2026-09-17
 
 **中文** — 可直接导入的 n8n 工作流：接收 Tokenearly 的 Webhook 推送（交易所上币公告、快讯、推特、信号、价格提醒），校验 Bearer Token，按中英韩上币关键词过滤后发到 Telegram、Discord、Slack 或追加到 Google Sheets。字段映射见下表。
 
@@ -22,8 +22,11 @@ Last updated: 2026-09-10
 | File | Flow | Credentials needed |
 |---|---|---|
 | [listing-alerts-no-signup-to-telegram.json](listing-alerts-no-signup-to-telegram.json) | Schedule (every 5 min) → Settings → HTTP Request (public listings feed) → guard → Split Out → Remove Duplicates → exchange filter → keyword filter → build message → spot/futures Telegram branches, optional Discord and Google Sheets | Telegram Bot API (Discord and Sheets optional) |
+| [listing-alerts-to-discord-and-slack.json](listing-alerts-to-discord-and-slack.json) | Schedule (every 5 min) → Settings → HTTP Request (public listings feed) → guard → Split Out → Remove Duplicates → exchange filter → keyword filter → build fields → green (spot) / orange (futures) Discord embeds via webhook, optional Slack incoming webhook | none (webhook URLs only) |
 
 It reads `https://tokenearly.com/api/public/listings.json`, a free unauthenticated JSON feed of new spot and futures listings across the 10 exchanges. Start here.
+
+The Discord and Slack variant reads the same feed and needs no n8n credential at all: paste a Discord channel webhook URL into `discord_webhook_url` in **Your settings**, and optionally set `send_to_slack` to `true` with a Slack incoming webhook URL. Spot listings arrive as green embeds, futures listings as orange ones.
 
 Everything you may want to change sits in one **Your settings** node: which exchanges, spot or futures, a keyword filter, how far back to look, the message language, and whether to also post to Discord or append to a sheet. *Remove Duplicates* stores every `permalink` already handled, so a listing is announced once even across restarts, and a guard node ends the run quietly when the feed returns nothing.
 

@@ -9,7 +9,7 @@
 - **공개 API 폴링 — 어떤 계정도 필요 없음.** 스케줄 트리거가 10개 거래소의 신규 상장을 담은 무료 읽기 전용 JSON API를 폴링합니다. 가입도, API 키도, Bearer Token도 필요하지 않습니다. 상장 알림을 가장 빠르게 채팅으로 받는 방법입니다.
 - **Tokenearly Webhook 수신.** Webhook 노드가 푸시된 알림을 받아 Bearer Token을 검증하고, 영어·중국어·한국어 상장 키워드로 필터링한 뒤 네 가지 필드(`title`, `content`, `timestamp`, `url`)를 매핑합니다.
 
-Last updated: 2026-09-10
+Last updated: 2026-09-17
 
 ## 워크플로
 
@@ -18,8 +18,11 @@ Last updated: 2026-09-10
 | 파일 | 흐름 | 필요한 자격 증명 |
 |---|---|---|
 | [listing-alerts-no-signup-to-telegram.json](listing-alerts-no-signup-to-telegram.json) | 스케줄(5분마다) → 설정 → HTTP Request(공개 상장 API) → 가드 → Split Out → Remove Duplicates → 거래소 필터 → 키워드 필터 → 메시지 구성 → 현물/선물 Telegram 분기, 선택적 Discord와 Google Sheets | Telegram Bot API(Discord와 Sheets는 선택) |
+| [listing-alerts-to-discord-and-slack.json](listing-alerts-to-discord-and-slack.json) | 스케줄(5분마다) → 설정 → HTTP Request(공개 상장 API) → 가드 → Split Out → Remove Duplicates → 거래소 필터 → 키워드 필터 → 필드 구성 → 현물(초록)/선물(주황) Discord 임베드를 webhook으로 전송, 선택적 Slack incoming webhook | 없음(webhook URL만 필요) |
 
 `https://tokenearly.com/api/public/listings.json`을 읽습니다. 10개 거래소의 현물·선물 신규 상장을 담은 무료 인증 불필요 JSON API입니다. 여기서 시작하세요.
+
+Discord·Slack 버전은 같은 API를 읽으며 n8n 자격 증명이 전혀 필요 없습니다. **Your settings**의 `discord_webhook_url`에 Discord 채널 webhook URL을 붙여 넣고, 선택적으로 `send_to_slack`을 `true`로 두고 Slack incoming webhook URL을 넣으면 됩니다. 현물 상장은 초록색 임베드, 선물 상장은 주황색 임베드로 도착합니다.
 
 바꾸고 싶은 모든 항목은 **Your settings** 노드 한 곳에 모여 있습니다. 어떤 거래소를 볼지, 현물만인지 선물만인지, 키워드 필터, 며칠까지 되돌아볼지, 메시지 언어, 그리고 Discord로도 보낼지 시트에 기록할지까지. *Remove Duplicates*가 이미 처리한 `permalink`를 모두 기억하므로 재시작 후에도 중복 알림이 없고, 가드 노드가 API 응답이 없을 때 조용히 실행을 종료합니다.
 
